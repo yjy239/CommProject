@@ -3,6 +3,7 @@ package com.example.asus.myproject;
 import android.app.Application;
 
 import com.example.easyioclibrary.base.ExceptionCrashHandler;
+import com.example.easyioclibrary.http.HttpUtils;
 
 /**
  * Created by asus on 2017/6/4.
@@ -15,6 +16,7 @@ public class BaseApplication extends Application{
     public void onCreate() {
         super.onCreate();
         ExceptionCrashHandler.getInstance().init(this);
+        HttpUtils.init(new OkHttpEngine());
         //初始化热修复
 //        try {
 //            PackageManager manager = this.getPackageManager();

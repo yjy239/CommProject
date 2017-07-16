@@ -35,7 +35,18 @@ public class MainActivity extends BaseSkinActivity{
     @Override
     public void setContentView() {
         setContentView(R.layout.activity_main);
-
+//        HttpUtils.with(this).url("").addParam().addParam()
+//                .execute(new HttpCallback<Object>() {
+//                    @Override
+//                    public void onError(Exception e) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(Object result) {
+//
+//                    }
+//                });
 
     }
 

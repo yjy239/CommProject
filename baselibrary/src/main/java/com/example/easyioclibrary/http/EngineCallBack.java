@@ -9,22 +9,27 @@ import java.util.Map;
  */
 public interface EngineCallBack {
 
-    void onPreExcute(Context context, Map<String,Object>);
+    void onPreExcute(Context context, Map<String,Object>map);
 
     void onError(Exception e);
 
 
-    void onSuccess(Object result);
+    void onSuccess(String result);
 
     //默认执行
-    public final EngineCallBack DefaultCallback = new EngineCallBack() {
+     EngineCallBack DefaultCallback = new EngineCallBack() {
+        @Override
+        public void onPreExcute(Context context,Map<String,Object>map) {
+
+        }
+
         @Override
         public void onError(Exception e) {
 
         }
 
         @Override
-        public void onSuccess(Object result) {
+        public void onSuccess(String result) {
 
         }
     };

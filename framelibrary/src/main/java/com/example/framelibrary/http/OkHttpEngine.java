@@ -1,7 +1,12 @@
-package com.example.easyioclibrary.http;
+package com.example.framelibrary.http;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.example.easyioclibrary.http.EngineCallBack;
+import com.example.easyioclibrary.http.HttpUtils;
+import com.example.easyioclibrary.http.IHttpEngine;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +24,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+
 /**
  * Created by asus on 2017/6/29.
  * 默认网络引擎
@@ -27,17 +33,28 @@ public class OkHttpEngine implements IHttpEngine {
 
     private static OkHttpClient mOkHttpClient = new OkHttpClient();
 
+
     @Override
-    public void get(Context context, String url, Map<String, Object> parms, final EngineCallBack callBack) {
+    public void get(final boolean iscache, Context context, String url, Map<String, Object> parms, final EngineCallBack callBack) {
         final String joinUrl = HttpUtils.joinParms(url,parms);
 //        if(callBack!=null){
 //            callBack.onPreExcute(joinUrl);
 //        }
 
+//        final IDaoSupport<CacheData> dataDaoSupport = DaoSupportFactory.getFactroy().getDao(CacheData.class);
         Log.e("http->get",joinUrl);
+        if(iscache){
+            String result = CacheUtils.getCacheJson(joinUrl);
+            //已经有缓存
+            if(!TextUtils.isEmpty(result)){
+                callBack.onSuccess(result);
+            }
+        }
+
         RequestBody body = appendBody(parms);
         Request.Builder builder = new Request.Builder()
                 .url(url)
+                .get()
                 .tag(context);
         builder.method("GET",null);
         Request request = builder.build();
@@ -49,7 +66,27 @@ public class OkHttpEngine implements IHttpEngine {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                callBack.onSuccess(response.body().string());
+                String requestResult = response.body().string();
+                //此处判断没有一样的缓存则保存
+                if (iscache){
+                    String result = CacheUtils.getCacheJson(joinUrl);
+                    if(!TextUtils.isEmpty(result)){
+                        if(result.equals(requestResult)){
+                            //内容一样不需要执行成功方法
+                            Log.e("数据一致：",requestResult);
+                            return;
+                        }
+                    }
+                }
+
+
+                //执行成功方法
+                callBack.onSuccess(requestResult);
+
+                //缓存数据
+                if(iscache){
+                    CacheUtils.cacheData(joinUrl,requestResult);
+                }
             }
         });
 
@@ -103,7 +140,7 @@ public class OkHttpEngine implements IHttpEngine {
     }
 
     @Override
-    public void post(Context context,String url, Map<String, Object> parms, final EngineCallBack callBack) {
+    public void post(boolean iscache,Context context,String url, Map<String, Object> parms, final EngineCallBack callBack) {
         final String joinUrl = HttpUtils.joinParms(url,parms);
 //        if(callBack!=null){
 //            callBack.onPreExcute(joinUrl);

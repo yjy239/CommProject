@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class HttpUtils {
 
-    private static IHttpEngine mHttpEngine = new OkHttpEngine();
+    private static IHttpEngine mHttpEngine = null;
 
     //请求地址
     private String mUrl;
@@ -27,6 +27,7 @@ public class HttpUtils {
 
     private Context mContext;
     private Map<String ,Object> mParams;
+    private boolean mCache = false;
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public HttpUtils(Context context){
@@ -48,6 +49,11 @@ public class HttpUtils {
         return this;
     }
 
+    public HttpUtils cache(boolean isCache){
+        mCache = isCache;
+        return this;
+    }
+
     //添加url
     public HttpUtils url(String mUrl){
         this.mUrl = mUrl;
@@ -65,11 +71,14 @@ public class HttpUtils {
         return this;
     }
 
+
     //执行回调
     public void execute(EngineCallBack callback){
         if(callback == null){
             callback = EngineCallBack.DefaultCallback;
         }
+
+        callback.onPreExcute(mContext,mParams);
 
         //判断执行的方法
         if(mType == GET_TYPE){
@@ -91,18 +100,19 @@ public class HttpUtils {
     }
 
     //切换引擎
-    public void exchangeEngine(IHttpEngine engine){
+    public HttpUtils exchangeEngine(IHttpEngine engine){
         mHttpEngine = engine;
+        return this;
     }
 
 
     private void get(String url, Map<String, Object> parms, EngineCallBack callBack) {
-        mHttpEngine.get(mContext,url,parms,callBack);
+        mHttpEngine.get(mCache,mContext,url,parms,callBack);
     }
 
 
     private void post(String url, Map<String, Object> parms, EngineCallBack callBack) {
-        mHttpEngine.post(mContext,url,parms,callBack);
+        mHttpEngine.post(mCache,mContext,url,parms,callBack);
     }
 
     public static String joinParms(String url, Map<String, Object> parms) {
