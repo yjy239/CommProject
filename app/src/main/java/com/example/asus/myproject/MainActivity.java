@@ -1,5 +1,7 @@
 package com.example.asus.myproject;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
@@ -7,6 +9,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.asus.myproject.service.GuardService;
+import com.example.asus.myproject.service.JobWakeUpService;
+import com.example.asus.myproject.service.MessageService;
 import com.example.easyioclibrary.CommonDialog.CommonDialog;
 import com.example.easyioclibrary.fix.FixClassManager;
 import com.example.easyioclibrary.ioc.CheckNet;
@@ -14,6 +19,7 @@ import com.example.easyioclibrary.ioc.OnClick;
 import com.example.easyioclibrary.ioc.ViewById;
 import com.example.easyioclibrary.ioc.ViewUtils;
 import com.example.framelibrary.BaseSkinActivity;
+import com.example.framelibrary.skin.SkinManager;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -54,9 +60,16 @@ public class MainActivity extends BaseSkinActivity{
     @Override
     public void initData() {
         mTextView.setText("IOCTV");
+        startService(new Intent(this, MessageService.class));
+        startService(new Intent(this, GuardService.class));
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            //必须大于5.0
+            startService(new Intent(this, JobWakeUpService.class));
+        }
 //        fixDexBug();
 //        int i = 2/0;
     }
+
 
     private void fixDexBug() {
         Log.e("fix","here");
@@ -74,6 +87,16 @@ public class MainActivity extends BaseSkinActivity{
 
             }
         }
+    }
+
+    public void skin(){
+        String skinpath = Environment.getExternalStorageDirectory().getAbsolutePath()
+                +File.separator+"red.skin";
+        int result = SkinManager.getInstance().loadSkin(skinpath);
+    }
+
+    public void skin1(){
+        int result = SkinManager.getInstance().restoreSkin();
     }
 
     @Override
