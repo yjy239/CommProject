@@ -1,6 +1,7 @@
 package com.example.framelibrary.http;
 
 import android.content.Context;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -32,6 +33,7 @@ import okhttp3.Response;
 public class OkHttpEngine implements IHttpEngine {
 
     private static OkHttpClient mOkHttpClient = new OkHttpClient();
+    private static Handler mHandler = new Handler();
 
 
     @Override
@@ -60,13 +62,19 @@ public class OkHttpEngine implements IHttpEngine {
         Request request = builder.build();
         mOkHttpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                callBack.onError(e);
+            public void onFailure(Call call, final IOException e) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBack.onError(e);
+                    }
+                });
+
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String requestResult = response.body().string();
+                final String requestResult = response.body().string();
                 //此处判断没有一样的缓存则保存
                 if (iscache){
                     String result = CacheUtils.getCacheJson(joinUrl);
@@ -79,9 +87,14 @@ public class OkHttpEngine implements IHttpEngine {
                     }
                 }
 
-
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBack.onSuccess(requestResult);
+                    }
+                });
                 //执行成功方法
-                callBack.onSuccess(requestResult);
+
 
                 //缓存数据
                 if(iscache){
@@ -156,13 +169,30 @@ public class OkHttpEngine implements IHttpEngine {
                 .build();
         mOkHttpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                callBack.onError(e);
+            public void onFailure(Call call, final IOException e) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBack.onError(e);
+                    }
+                });
+
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                callBack.onSuccess(response.body().string());
+            public void onResponse(Call call, final Response response) throws IOException {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            callBack.onSuccess(response.body().string());
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+
             }
         });
     }
