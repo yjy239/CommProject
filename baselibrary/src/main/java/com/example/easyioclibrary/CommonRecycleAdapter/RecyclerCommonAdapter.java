@@ -71,6 +71,10 @@ public abstract class RecyclerCommonAdapter<T> extends RecyclerView.Adapter<View
         }
     }
 
+    public List<T> getList(){
+        return mData;
+    }
+
     //将必要的参数全部传出去
     /****
      * 复写的方法

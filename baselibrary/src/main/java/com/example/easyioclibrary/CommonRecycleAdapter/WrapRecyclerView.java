@@ -28,10 +28,15 @@ public class WrapRecyclerView extends RecyclerView {
 
     @Override
     public void setAdapter(RecyclerView.Adapter adapter){
-
         mAdapter = new WrapRecyclerViewAdpater(adapter);
         super.setAdapter(mAdapter);
+        mAdapter.attachToRecyclerView(this);
+    }
 
+    public void setAdapter(RecyclerCommonAdapter adapter){
+        mAdapter = new WrapRecyclerViewAdpater(adapter);
+        super.setAdapter(mAdapter);
+        mAdapter.attachToRecyclerView(this);
     }
 
     //添加头部
@@ -62,6 +67,15 @@ public class WrapRecyclerView extends RecyclerView {
             mAdapter.removeFooterView(view);
         }
     }
+
+    public void setTouchHelperOpen(boolean isTouch){
+        mAdapter.setTouchHelperOpen(isTouch);
+    }
+
+    public void setTouchHelperListener(ItemTouchHelperListener listener){
+        mAdapter.setTouchHelperListener(listener);
+    }
+
 
 
 }
