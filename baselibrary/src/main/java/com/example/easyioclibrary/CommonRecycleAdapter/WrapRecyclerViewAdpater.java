@@ -1,7 +1,9 @@
 package com.example.easyioclibrary.CommonRecycleAdapter;
 
 import android.graphics.Canvas;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
@@ -31,6 +33,8 @@ public class WrapRecyclerViewAdpater extends RecyclerView.Adapter<RecyclerView.V
     private WrapRecyclerViewAdpater.ItemTouchCallback callback;
 
     private ItemTouchHelper helper;
+
+    private RecyclerView.LayoutManager mLayoutManager;
 
     private  int MARK = 1 << 31; //10 00 00 01
 
@@ -123,6 +127,51 @@ public class WrapRecyclerViewAdpater extends RecyclerView.Adapter<RecyclerView.V
     }
 
     @Override
+    public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
+        if(lp != null
+                && lp instanceof StaggeredGridLayoutManager.LayoutParams) {
+            StaggeredGridLayoutManager.LayoutParams p = (StaggeredGridLayoutManager.LayoutParams) lp;
+            if(holder.getAdapterPosition() < getHeadersCount()){
+                p.setFullSpan(true);
+            }else if(holder.getAdapterPosition()>getHeadersCount()+getRealCount()-1){
+                p.setFullSpan(true);
+            }else {
+                p.setFullSpan(false);
+            }
+
+        }
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        mLayoutManager = recyclerView.getLayoutManager();
+        fullItem();
+
+    }
+
+    private void fullItem(){
+        if (mLayoutManager != null&&mLayoutManager instanceof GridLayoutManager) {
+            final GridLayoutManager gridLayoutManager = (GridLayoutManager) mLayoutManager;
+            Log.e("mLayoutManager",""+(mLayoutManager instanceof GridLayoutManager));
+            Log.e("span",""+gridLayoutManager.getSpanCount());
+            gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    if(position < getHeadersCount()){
+                        return  gridLayoutManager.getSpanCount();
+                    }else if(position > getHeadersCount()+getRealCount()-1){
+                        return  gridLayoutManager.getSpanCount();
+                    }
+                    return 1;
+                }
+            });
+        }
+    }
+
+    @Override
     public int getItemViewType(int position) {
         //根据位置返回
         return getType(position);
@@ -148,7 +197,6 @@ public class WrapRecyclerViewAdpater extends RecyclerView.Adapter<RecyclerView.V
                 mRealAdapter.onBindViewHolder(holder,adjPosition);
             }
         }
-
 
     }
 
