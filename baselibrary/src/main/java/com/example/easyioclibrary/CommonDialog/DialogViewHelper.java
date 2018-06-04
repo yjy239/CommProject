@@ -10,7 +10,7 @@ import java.lang.ref.WeakReference;
 
 /**
  * Created by asus on 2017/6/20.
- * 视图富足处理类
+ * 视图辅助处理类
  */
 class DialogViewHelper {
 

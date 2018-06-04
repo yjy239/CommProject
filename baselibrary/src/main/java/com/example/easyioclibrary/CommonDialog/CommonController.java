@@ -29,6 +29,7 @@ public class CommonController {
         return mDialog;
     }
 
+
     public Window getWindow(){
         return mWindow;
     }
@@ -72,7 +73,8 @@ public class CommonController {
         public int mAniamtion = 0;
         //位置
         public int mGravity = Gravity.CENTER;
-        public int mHeight=ViewGroup.LayoutParams.WRAP_CONTENT;
+        public int mHeight = ViewGroup.LayoutParams.WRAP_CONTENT;
+        public boolean isActivity  = false;
 
         public CommonParams(Context context, int themid) {
             this.mContext = context;

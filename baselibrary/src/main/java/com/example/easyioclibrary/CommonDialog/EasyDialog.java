@@ -2,6 +2,7 @@ package com.example.easyioclibrary.CommonDialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,49 +12,43 @@ import com.example.easyioclibrary.R;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by asus on 2017/6/20.
+ * <pre>
+ *     author : yjy
+ *     e-mail : yujunyu12@gmail.com
+ *     time   : 2018/06/04
+ *     desc   :抽象出来
+ *     version: 1.0
+ * </pre>
  */
-public class CommonDialog extends Dialog implements ICommonDialog{
+
+public class EasyDialog implements ICommonDialog {
 
     private CommonController mCommon;
+    private ICommonDialog mDialog;
 
-    public CommonDialog(Context context) {
-        super(context);
+    public EasyDialog(ICommonDialog dialog){
+        this.mDialog = dialog;
     }
 
-    public CommonDialog(Context context, int themeResId) {
-        super(context, themeResId);
-        mCommon = new CommonController(this,getWindow());
-    }
-
-    public CommonDialog(Context context, boolean cancelable, OnCancelListener cancelListener) {
-        super(context, cancelable, cancelListener);
-    }
-
-    //设置text
+    @Override
     public void setText(int viewid, CharSequence text) {
-      mCommon.setText(viewid,text);
+
     }
 
-    private <T extends View> T getView(int viewid) {
-      return mCommon.getView(viewid);
-    }
-
-    //设置点击事件
+    @Override
     public void setClickListener(int i, View.OnClickListener listener) {
-        mCommon.setClickListener(i,listener);
+
     }
 
     @Override
     public void showDialog() {
-        this.show();
+
     }
 
     @Override
     public void dismissDialog() {
-        this.dismiss();
-    }
 
+    }
 
 
     public static class Builder{
@@ -72,14 +67,14 @@ public class CommonDialog extends Dialog implements ICommonDialog{
          *
          * @return This Builder object to allow for chaining of calls to set methods
          */
-        public Builder setContentView(View view) {
+        public EasyDialog.Builder setContentView(View view) {
             P.mView = view;
             P.mViewLayoutResId = 0;
             return this;
         }
 
         //设置内容id
-        public Builder setContentView(int resid) {
+        public EasyDialog.Builder setContentView(int resid) {
             P.mView = null;
             P.mViewLayoutResId = resid;
             return this;
@@ -90,7 +85,7 @@ public class CommonDialog extends Dialog implements ICommonDialog{
          *
          * @return This Builder object to allow for chaining of calls to set methods
          */
-        public Builder setCancelable(boolean cancelable) {
+        public EasyDialog.Builder setCancelable(boolean cancelable) {
             P.mCancelable = cancelable;
             return this;
         }
@@ -102,13 +97,13 @@ public class CommonDialog extends Dialog implements ICommonDialog{
          * being canceled or one of the supplied choices being selected.
          * If you are interested in listening for all cases where the dialog is dismissed
          * and not just when it is canceled, see
-         * {@link #setOnDismissListener(OnDismissListener) setOnDismissListener}.</p>
+         * {@link #setOnDismissListener(DialogInterface.OnDismissListener) setOnDismissListener}.</p>
          * @see #setCancelable(boolean)
-         * @see #setOnDismissListener(OnDismissListener)
+         * @see #setOnDismissListener(DialogInterface.OnDismissListener)
          *
          * @return This Builder object to allow for chaining of calls to set methods
          */
-        public Builder setOnCancelListener(OnCancelListener onCancelListener) {
+        public EasyDialog.Builder setOnCancelListener(DialogInterface.OnCancelListener onCancelListener) {
             P.mOnCancelListener = onCancelListener;
             return this;
         }
@@ -118,7 +113,7 @@ public class CommonDialog extends Dialog implements ICommonDialog{
          *
          * @return This Builder object to allow for chaining of calls to set methods
          */
-        public Builder setOnDismissListener(OnDismissListener onDismissListener) {
+        public EasyDialog.Builder setOnDismissListener(DialogInterface.OnDismissListener onDismissListener) {
             P.mOnDismissListener = onDismissListener;
             return this;
         }
@@ -128,32 +123,37 @@ public class CommonDialog extends Dialog implements ICommonDialog{
          *
          * @return This Builder object to allow for chaining of calls to set methods
          */
-        public Builder setOnKeyListener(OnKeyListener onKeyListener) {
+        public EasyDialog.Builder setOnKeyListener(DialogInterface.OnKeyListener onKeyListener) {
             P.mOnKeyListener = onKeyListener;
             return this;
         }
 
+        public Builder asActivity(){
+            P.isActivity = true;
+            return this;
+        }
+
         //设置文本
-        public Builder setText(int resid,CharSequence text){
+        public EasyDialog.Builder setText(int resid, CharSequence text){
             P.textMap.put(resid,text);
             return this;
         }
 
         //设置点击事件
-        public Builder setOnClickListener(int resid, WeakReference<View.OnClickListener> listener){
+        public EasyDialog.Builder setOnClickListener(int resid, WeakReference<View.OnClickListener> listener){
             P.clickMap.put(resid,listener);
             return this;
         }
 
         //配置一些通用参数
         //设置满屏幕
-        public Builder fullWidth(){
+        public EasyDialog.Builder fullWidth(){
             P.mWidth = ViewGroup.LayoutParams.MATCH_PARENT;
             return this;
         }
 
         //从底部
-        public Builder fromBottom(boolean isAnimation){
+        public EasyDialog.Builder fromBottom(boolean isAnimation){
             if(isAnimation){
                 P.mAniamtion = R.style.dialog_from_bottom;
             }
@@ -162,33 +162,32 @@ public class CommonDialog extends Dialog implements ICommonDialog{
         }
 
         //设置宽高
-        public Builder setWidthAndHeight(int width,int height){
+        public EasyDialog.Builder setWidthAndHeight(int width, int height){
             P.mWidth = width;
             P.mHeight = height;
             return this;
         }
 
         //添加默认动画
-        public Builder addDefaultAnimation(){
+        public EasyDialog.Builder addDefaultAnimation(){
             P.mAniamtion = R.style.default_animation;
             return this;
         }
 
         //添加动画
-        public Builder addAnimation(int styleAnimation){
+        public EasyDialog.Builder addAnimation(int styleAnimation){
             P.mAniamtion = styleAnimation;
             return this;
         }
 
 
         public Builder(Context context,int themid){
-           P =  new CommonController.CommonParams(context,themid);
+            P =  new CommonController.CommonParams(context,themid);
         }
 
-
-        public CommonDialog create() {
+        public ICommonDialog create() {
             final CommonDialog dialog = new CommonDialog(P.mContext,P.thmeid);
-            P.apply(dialog.mCommon);
+
             dialog.setCancelable(P.mCancelable);
             if (P.mCancelable) {
                 dialog.setCanceledOnTouchOutside(true);
@@ -198,13 +197,16 @@ public class CommonDialog extends Dialog implements ICommonDialog{
             if (P.mOnKeyListener != null) {
                 dialog.setOnKeyListener(P.mOnKeyListener);
             }
-            return dialog;
+
+            EasyDialog easyDialog = new EasyDialog(dialog);
+            P.apply(easyDialog.mCommon);
+
+            return null;
         }
 
-        public CommonDialog show() {
-            CommonDialog dialog = create();
-            dialog.show();
-            return dialog;
+        public ICommonDialog show() {
+
+            return null;
         }
     }
 }
