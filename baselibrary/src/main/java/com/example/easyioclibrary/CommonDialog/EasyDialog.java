@@ -3,6 +3,7 @@ package com.example.easyioclibrary.CommonDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,32 +29,38 @@ public class EasyDialog implements ICommonDialog {
 
     public EasyDialog(ICommonDialog dialog){
         this.mDialog = dialog;
+        mCommon = new CommonController((CommonDialog)dialog,((CommonDialog) dialog).getWindow());
+    }
+
+    public EasyDialog(){
+
     }
 
     @Override
     public void setText(int viewid, CharSequence text) {
-
+        mDialog.setText(viewid,text);
     }
 
     @Override
     public void setClickListener(int i, View.OnClickListener listener) {
-
+        mDialog.setClickListener(i,listener);
     }
 
     @Override
     public void showDialog() {
-
+        mDialog.showDialog();
     }
 
     @Override
     public void dismissDialog() {
-
+        mDialog.dismissDialog();
     }
 
 
     public static class Builder{
 
         private final CommonController.CommonParams P;
+        private Context mContext;
 
         public Builder(Context context){
             this(context, R.style.dialog);
@@ -183,25 +190,34 @@ public class EasyDialog implements ICommonDialog {
 
         public Builder(Context context,int themid){
             P =  new CommonController.CommonParams(context,themid);
+            mContext = context;
         }
 
         public ICommonDialog create() {
-            final CommonDialog dialog = new CommonDialog(P.mContext,P.thmeid);
 
-            dialog.setCancelable(P.mCancelable);
-            if (P.mCancelable) {
-                dialog.setCanceledOnTouchOutside(true);
+            EasyDialog easyDialog = null;
+            if(!P.isActivity){
+                final CommonDialog dialog = new CommonDialog(P.mContext,P.thmeid);
+                easyDialog = new EasyDialog(dialog);
+                P.apply(easyDialog.mCommon);
+
+                dialog.setCancelable(P.mCancelable);
+                if (P.mCancelable) {
+                    dialog.setCanceledOnTouchOutside(true);
+                }
+                dialog.setOnCancelListener(P.mOnCancelListener);
+                dialog.setOnDismissListener(P.mOnDismissListener);
+                if (P.mOnKeyListener != null) {
+                    dialog.setOnKeyListener(P.mOnKeyListener);
+                }
+            }else {
+                easyDialog = new EasyDialog();
+                P.apply(easyDialog.mCommon);
             }
-            dialog.setOnCancelListener(P.mOnCancelListener);
-            dialog.setOnDismissListener(P.mOnDismissListener);
-            if (P.mOnKeyListener != null) {
-                dialog.setOnKeyListener(P.mOnKeyListener);
-            }
 
-            EasyDialog easyDialog = new EasyDialog(dialog);
-            P.apply(easyDialog.mCommon);
 
-            return null;
+
+            return easyDialog;
         }
 
         public ICommonDialog show() {
