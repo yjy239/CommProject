@@ -16,6 +16,24 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
+    <style name="DialogActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/AnimBottom</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <!-- 半透明 -->
+        <!--<item name="android:windowNoTitle">true</item>-->
+        <item name="android:windowBackground">@color/translate</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <!-- 模糊 -->
+    </style>
+
+    <style name="AnimBottom" parent="@android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/push_in</item>
+        <item name="android:windowExitAnimation">@anim/push_out</item>
+    </style>
+
     <style name="dialog_from_bottom">
         <item name="android:windowEnterAnimation">@anim/dialog_from_bottom</item>
         <item name="android:windowExitAnimation">@anim/dialog_from_bottom_out</item>

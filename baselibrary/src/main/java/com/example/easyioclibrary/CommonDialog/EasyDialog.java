@@ -33,7 +33,7 @@ public class EasyDialog implements ICommonDialog {
     }
 
     public EasyDialog(){
-
+        mCommon = new CommonController();
     }
 
     @Override
@@ -194,27 +194,25 @@ public class EasyDialog implements ICommonDialog {
         }
 
         public ICommonDialog create() {
-
             EasyDialog easyDialog = null;
             if(!P.isActivity){
                 final CommonDialog dialog = new CommonDialog(P.mContext,P.thmeid);
                 easyDialog = new EasyDialog(dialog);
                 P.apply(easyDialog.mCommon);
 
-                dialog.setCancelable(P.mCancelable);
-                if (P.mCancelable) {
+                dialog.setCancelable(P.getCancelable());
+                if (P.getCancelable()) {
                     dialog.setCanceledOnTouchOutside(true);
                 }
-                dialog.setOnCancelListener(P.mOnCancelListener);
-                dialog.setOnDismissListener(P.mOnDismissListener);
+                dialog.setOnCancelListener(P.getCancelListener());
+                dialog.setOnDismissListener(P.getDismissListener());
                 if (P.mOnKeyListener != null) {
-                    dialog.setOnKeyListener(P.mOnKeyListener);
+                    dialog.setOnKeyListener(P.getKeyListener());
                 }
             }else {
                 easyDialog = new EasyDialog();
                 P.apply(easyDialog.mCommon);
             }
-
 
 
             return easyDialog;

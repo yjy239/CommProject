@@ -25,6 +25,10 @@ public class CommonController {
         this.mWindow = window;
     }
 
+    public CommonController(){
+
+    }
+
     public CommonDialog getDialog(){
         return mDialog;
     }
@@ -36,6 +40,10 @@ public class CommonController {
 
     public void setViewHelper(DialogViewHelper viewHelper) {
         this.viewHelper = viewHelper;
+    }
+
+    public DialogViewHelper getViewHelper(){
+        return viewHelper;
     }
 
     public void setText(int viewid, CharSequence text) {
@@ -51,7 +59,112 @@ public class CommonController {
     }
 
 
-    public static class CommonParams{
+    /**
+     * Activity Dialog 参数
+     */
+    public static class ActivityParams implements ICommonParams{
+
+        public Context mContext;
+        public int thmeid;
+        //点击空白是否消失
+        public boolean mCancelable = true;
+        //cancel监听
+        public DialogInterface.OnCancelListener mOnCancelListener;
+        //消失监听
+        public DialogInterface.OnDismissListener mOnDismissListener;
+        //按键监听
+        public DialogInterface.OnKeyListener mOnKeyListener;
+        public View mView;
+        public int mViewLayoutResId;
+        public SparseArray<CharSequence> textMap = new SparseArray<>();
+        public SparseArray<WeakReference<View.OnClickListener>> clickMap = new SparseArray<>();
+        //宽度
+        public int mWidth = ViewGroup.LayoutParams.WRAP_CONTENT;
+        //动画
+        public int mAniamtion = 0;
+        //位置
+        public int mGravity = Gravity.CENTER;
+        public int mHeight = ViewGroup.LayoutParams.WRAP_CONTENT;
+        public boolean isActivity  = false;
+
+        public ActivityParams(Context context, int themid){
+            this.mContext = context;
+            this.thmeid = themid;
+        }
+
+        @Override
+        public void apply(CommonController mCommon) {
+            //设置布局
+            DialogViewHelper viewHelper = null;
+            if(mViewLayoutResId != 0){
+                viewHelper = new DialogViewHelper(mContext,mViewLayoutResId);
+            }
+
+            if(mView != null){
+                viewHelper = new DialogViewHelper();
+                viewHelper.setContentView(mView);
+            }
+
+            if(viewHelper == null){
+                throw new IllegalArgumentException("没有调用setContentView");
+            }
+
+
+            //设置文本
+
+            for(int i = 0;i<textMap.size();i++){
+                viewHelper.setText(textMap.keyAt(i),textMap.valueAt(i));
+
+            }
+            //设置点击事件
+            for(int i = 0;i<clickMap.size();i++){
+                viewHelper.setClickListener(clickMap.keyAt(i),clickMap.valueAt(i).get());
+            }
+
+            mCommon.setViewHelper(viewHelper);
+        }
+
+        @Override
+        public int getHeight() {
+            return mHeight;
+        }
+
+        @Override
+        public int getWidth() {
+            return mWidth;
+        }
+
+        @Override
+        public int getGravity() {
+            return mGravity;
+        }
+
+        @Override
+        public boolean getCancelable() {
+            return mCancelable;
+        }
+
+        @Override
+        public DialogInterface.OnCancelListener getCancelListener() {
+            return mOnCancelListener;
+        }
+
+        @Override
+        public DialogInterface.OnDismissListener getDismissListener() {
+            return mOnDismissListener;
+        }
+
+        @Override
+        public DialogInterface.OnKeyListener getKeyListener() {
+            return mOnKeyListener;
+        }
+    }
+
+
+    /**
+     * Dialog的参数
+     */
+    public static class CommonParams implements ICommonParams{
 
         public Context mContext;
         public int thmeid;
@@ -83,7 +196,8 @@ public class CommonController {
         }
 
         /***
-         * 绑定甚至**/
+         * 绑定参数**/
+        @Override
         public void apply(CommonController mCommon) {
             //设置布局
             DialogViewHelper viewHelper = null;
@@ -125,6 +239,41 @@ public class CommonController {
             params.width = mWidth;
             params.height = mHeight;
             window.setAttributes(params);
+        }
+
+        @Override
+        public int getHeight() {
+            return mHeight;
+        }
+
+        @Override
+        public int getWidth() {
+            return mWidth;
+        }
+
+        @Override
+        public int getGravity() {
+            return mGravity;
+        }
+
+        @Override
+        public boolean getCancelable() {
+            return mCancelable;
+        }
+
+        @Override
+        public DialogInterface.OnCancelListener getCancelListener() {
+            return mOnCancelListener;
+        }
+
+        @Override
+        public DialogInterface.OnDismissListener getDismissListener() {
+            return mOnDismissListener;
+        }
+
+        @Override
+        public DialogInterface.OnKeyListener getKeyListener() {
+            return mOnKeyListener;
         }
     }
 }
